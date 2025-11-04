@@ -1,0 +1,244 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+    Node* prev;
+};
+
+class CircularList {
+    Node* head;
+public:
+    CircularList() { head = nullptr; }
+
+    void insertFirst(int v) {
+        Node* n = new Node{v, nullptr, nullptr};
+        if (!head) {
+            head = n;
+            n->next = head;
+            return;
+        }
+        Node* t = head;
+        while (t->next != head) t = t->next;
+        t->next = n;
+        n->next = head;
+        head = n;
+    }
+
+    void insertLast(int v) {
+        Node* n = new Node{v, nullptr, nullptr};
+        if (!head) {
+            head = n;
+            n->next = head;
+            return;
+        }
+        Node* t = head;
+        while (t->next != head) t = t->next;
+        t->next = n;
+        n->next = head;
+    }
+
+    void insertAfter(int key, int v) {
+        if (!head) return;
+        Node* t = head;
+        do {
+            if (t->data == key) {
+                Node* n = new Node{v, t->next, nullptr};
+                t->next = n;
+                return;
+            }
+            t = t->next;
+        } while (t != head);
+    }
+
+    void insertBefore(int key, int v) {
+        if (!head) return;
+        Node* t = head;
+        Node* p = nullptr;
+        do {
+            if (t->data == key) {
+                Node* n = new Node{v, t, nullptr};
+                if (p)
+                    p->next = n;
+                else {
+                    Node* l = head;
+                    while (l->next != head) l = l->next;
+                    l->next = n;
+                    head = n;
+                }
+                return;
+            }
+            p = t;
+            t = t->next;
+        } while (t != head);
+    }
+
+    void del(int v) {
+        if (!head) return;
+        Node* t = head;
+        Node* p = nullptr;
+        do {
+            if (t->data == v) {
+                if (p)
+                    p->next = t->next;
+                else {
+                    Node* l = head;
+                    while (l->next != head) l = l->next;
+                    head = head->next;
+                    l->next = head;
+                }
+                delete t;
+                return;
+            }
+            p = t;
+            t = t->next;
+        } while (t != head);
+    }
+
+    void search(int v) {
+        if (!head) {
+            cout << "Not found\n";
+            return;
+        }
+        Node* t = head;
+        int pos = 1;
+        do {
+            if (t->data == v) {
+                cout << "Found at position " << pos << "\n";
+                return;
+            }
+            pos++;
+            t = t->next;
+        } while (t != head);
+        cout << "Not found\n";
+    }
+
+    void display() {
+        if (!head) {
+            cout << "Empty list\n";
+            return;
+        }
+        Node* t = head;
+        do {
+            cout << t->data << " ";
+            t = t->next;
+        } while (t != head);
+        cout << head->data << "\n";
+    }
+};
+
+class DoublyList {
+    Node* head;
+public:
+    DoublyList() { head = nullptr; }
+
+    void insertFirst(int v) {
+        Node* n = new Node{v, head, nullptr};
+        if (head) head->prev = n;
+        head = n;
+    }
+
+    void insertLast(int v) {
+        Node* n = new Node{v, nullptr, nullptr};
+        if (!head) {
+            head = n;
+            return;
+        }
+        Node* t = head;
+        while (t->next) t = t->next;
+        t->next = n;
+        n->prev = t;
+    }
+
+    void insertAfter(int key, int v) {
+        Node* t = head;
+        while (t) {
+            if (t->data == key) {
+                Node* n = new Node{v, t->next, t};
+                if (t->next) t->next->prev = n;
+                t->next = n;
+                return;
+            }
+            t = t->next;
+        }
+    }
+
+    void insertBefore(int key, int v) {
+        Node* t = head;
+        while (t) {
+            if (t->data == key) {
+                Node* n = new Node{v, t, t->prev};
+                if (t->prev)
+                    t->prev->next = n;
+                else
+                    head = n;
+                t->prev = n;
+                return;
+            }
+            t = t->next;
+        }
+    }
+
+    void del(int v) {
+        Node* t = head;
+        while (t) {
+            if (t->data == v) {
+                if (t->prev)
+                    t->prev->next = t->next;
+                else
+                    head = t->next;
+                if (t->next)
+                    t->next->prev = t->prev;
+                delete t;
+                return;
+            }
+            t = t->next;
+        }
+    }
+
+    void search(int v) {
+        Node* t = head;
+        int pos = 1;
+        while (t) {
+            if (t->data == v) {
+                cout << "Found at position " << pos << "\n";
+                return;
+            }
+            pos++;
+            t = t->next;
+        }
+        cout << "Not found\n";
+    }
+
+    void display() {
+        Node* t = head;
+        while (t) {
+            cout << t->data << " ";
+            t = t->next;
+        }
+        cout << "\n";
+    }
+};
+
+int main() {
+    CircularList cl;
+    DoublyList dl;
+    int type, ch, val, key;
+    while (true) {
+        cout << "\n1. Circular List  2. Doubly List  3. Exit\nEnter choice: ";
+        cin >> type;
+        if (type == 3) break;
+        cout << "1. Insert First 2. Insert Last 3. Insert After 4. Insert Before 5. Delete 6. Search 7. Display\n";
+        cin >> ch;
+        switch (ch) {
+            case 1: cout << "Enter value: "; cin >> val; if (type == 1) cl.insertFirst(val); else dl.insertFirst(val); break;
+            case 2: cout << "Enter value: "; cin >> val; if (type == 1) cl.insertLast(val); else dl.insertLast(val); break;
+            case 3: cout << "Enter key and value: "; cin >> key >> val; if (type == 1) cl.insertAfter(key, val); else dl.insertAfter(key, val); break;
+            case 4: cout << "Enter key and value: "; cin >> key >> val; if (type == 1) cl.insertBefore(key, val); else dl.insertBefore(key, val); break;
+            case 5: cout << "Enter value to delete: "; cin >> val; if (type == 1) cl.del(val); else dl.del(val); break;
+            case 6: cout << "Enter value to search: "; cin >> val; if (type == 1) cl.search(val); else dl.search(val); break;
+            case 7: if (type == 1) cl.display(); else dl.display(); break;
+        }
+    }
+}
